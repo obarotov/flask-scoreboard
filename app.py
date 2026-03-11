@@ -1,25 +1,15 @@
-from flask import Flask
+from flask import Flask,render_template
 
 app = Flask(__name__)
 
 
 @app.route("/")
-def home():
-    return """
-    <html>
-    <head><title>My App</title></head>
-    <body>
-    <h1>Welcome to Flask</h1>
-    <p>This is HTML returned from Python</p>
-    <a href="/about">Go to about</a>
-    </body>
-    </html>
-    """
-
+def main():
+    return render_template("/main_page.html")
 
 @app.route("/about")
 def about():
-    return "This is the about page"
+    return render_template("/about.html")
 
 @app.route("/student/<name>")
 def student(name):
