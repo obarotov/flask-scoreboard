@@ -59,7 +59,7 @@ def grade(name):
     elif score == 0:
        result = "Not enough data"
     
-    return f"{name}: {score}% - {result}"
+    return render_template("student.html", name=name, score=score, result=result)
 
 
 if __name__ == "__main__":
