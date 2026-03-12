@@ -1,4 +1,4 @@
-from flask import Flask,render_template,jsonify
+from flask import Flask,render_template,jsonify,request,redirect
 
 app = Flask(__name__)
 
@@ -27,10 +27,19 @@ def about():
 
 
 @app.route('/students')
-def students():
- sorted_students = sorted(students_data.items(), key=lambda x: x[1], reverse=True)
+def list_students():
+    search_query = request.args.get("search", "").strip().lower()
 
- return render_template('students.html', students=sorted_students)
+    if search_query:
+        filtered_students = {
+            name: score for name, score in students_data.items() 
+            if search_query in name.lower()
+        }
+    else:
+        filtered_students = students_data
+
+    sorted_students = dict(sorted(filtered_students.items(), key=lambda item: item[1], reverse=True))
+    return render_template("students.html", students=sorted_students, search_query=search_query)
 
 @app.route("/student/<name>")
 def student_detail(name):
@@ -80,16 +89,33 @@ def one_student(name):
 
     }
     return jsonify(fresult)
-        
-        
 
 
-@app.route("/add")
-def add(name):
-    if name not in students_data:
-        return f"Success"
+@app.route("/add", methods=["GET", "POST"])
+def add_student():
+    error = None
     
+    if request.method == "POST":
+        name = request.form.get("name", "").strip().title()
+        score_str = request.form.get("score")
 
+        if not name:
+            error = "Error: Name cannot be empty."
+        elif name in students_data:
+            error = f"Error: '{name}' is already in the scoreboard."
+        else:
+            try:
+                score = int(score_str)
+                if 0 <= score <= 100:
+                    students_data[name] = score
+                    return redirect("/students") 
+                else:
+                    error = "Error: Score must be between 0 and 100."
+            except (ValueError, TypeError):
+                error = "Error: Please enter a valid numerical score."
+
+    return render_template("add.html", error=error)
+        
 
 
 if __name__ == "__main__":
