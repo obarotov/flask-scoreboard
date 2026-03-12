@@ -14,6 +14,7 @@
             color: #f8fafc;
             font-family: 'Plus Jakarta Sans', sans-serif;
             padding: 40px 0;
+            min-height: 100vh;
         }
         .leaderboard-container {
             background: rgba(255, 255, 255, 0.02);
@@ -24,6 +25,22 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
         h1 { font-weight: 800; margin-bottom: 2rem; }
+        .search-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 20px;
+            color: white;
+            width: 100%;
+            margin-bottom: 1.5rem;
+            transition: 0.3s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--brand-red);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(221, 75, 57, 0.2);
+        }
         .table { color: #f8fafc; border-color: rgba(255,255,255,0.05); }
         .table thead th { 
             background: transparent; 
@@ -60,6 +77,41 @@
         <div class="leaderboard-container mx-auto" style="max-width: 800px;">
             <h1 class="text-center">Student <span style="color: var(--brand-red);">Scoreboard</span></h1>
             
+            <div class="search-box">
+    <input type="text" 
+           id="studentSearch" 
+           class="search-input" 
+           placeholder="Type to search (e.g. 'ah')..." 
+           value="{{ search_query or '' }}">
+</div>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th scope="col" style="width: 10%">#</th>
+                <th scope="col">Name</th>
+                <th scope="col" class="text-end">Score</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            {% for name, score in students.items() %}
+            <tr class="student-row">
+                <td class="rank">{{ loop.index }}</td>
+                <td class="fw-bold student-name">{{ name }}</td>
+                <td class="text-end">
+                    <span class="score-pill">{{ score }}</span>
+                </td>
+            </tr>
+            {% endfor %}
+            <tr id="noResultRow" style="display: none;">
+                <td colspan="3" class="text-center py-4" style="color: #64748b;">
+                    No students found.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
             <div class="table-responsive">
                 <table class="table align-middle">
                     <thead>
@@ -70,12 +122,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for name, score in students %}
+                        {% for name, score in students.items() %}
                         <tr>
                             <td class="rank">{{ loop.index }}</td>
                             <td class="fw-bold">{{ name }}</td>
                             <td class="text-end">
                                 <span class="score-pill">{{ score }}</span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center py-4" style="color: #64748b;">
+                                No students found matching "{{ search_query }}"
                             </td>
                         </tr>
                         {% endfor %}
@@ -84,5 +142,6 @@
             </div>
         </div>
     </div>
+    <script src="../static/script.js"></script>
 </body>
 </html>
